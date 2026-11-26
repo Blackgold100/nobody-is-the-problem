@@ -305,3 +305,7 @@ sup.fn a { text-decoration: none; padding: 0 2px; color: var(--clay); }
 .btn-clay:hover { background: #6F4A17; }
 .reading-progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--gold); width: 0; z-index: 50; }
 .nav a.btn-gold, .nav a.btn-gold:hover { color: #1D1C18; }
+
+.dedication { font-family: var(--serif); font-style: italic; font-size: 19px; line-height: 1.6; color: var(--ink-2); border-left: 2px solid var(--clay); margin: 22px 0 0; padding: 4px 0 4px 18px; max-width: 640px; }
+.copyright-notice { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.6; color: var(--muted); max-width: 680px; }
+.copyright-notice p { margin: 0 0 8px; }

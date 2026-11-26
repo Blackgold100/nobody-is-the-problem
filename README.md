@@ -39,7 +39,9 @@ The home of the book *Nobody Is the Problem* by Lincoln Matthew. Readers can rea
 5. Sign in at `/login`, then go to **Dashboard → Settings → Donation account** and paste your **bank name, account number and account name**. Until you do, the donate page says donations open soon. Choose whether transfers unlock **after you confirm** (the default) or **straight away**.
 6. Set your web address in the marketing kit and start posting (see the kit's README).
 
-The book is loaded automatically from `data/book.json` the first time the site starts with an empty database; the figures are in `public/book/`. Edit any chapter afterwards under **Dashboard → Chapters**.
+The book is loaded automatically from `data/book.json` the first time the site starts; the figures are in `public/book/`. When a new version of `data/book.json` is deployed, each section's text and notes are refreshed in place on the next start. Readers' reviews, reflections and reading progress are kept, and so are your free/locked settings and publish dates. (Set the secret `BOOK_AUTO_UPDATE=off` to stop this, for example if you prefer to edit chapters only in the dashboard.)
+
+`docs/manuscript-resolutions.md` lists how every bracketed note in the manuscript was resolved, with the final wording to paste into the Word manuscript.
 
 ### Card payments (optional)
 Paystack code is still included but **switched off**. The site only offers bank transfer unless you add a `PAYSTACK_SECRET_KEY` secret (and set the webhook to `https://YOUR-SITE/pay/webhook`).

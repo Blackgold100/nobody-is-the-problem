@@ -29,7 +29,7 @@ function previewOf(md, words = 170) {
 async function chapterList() {
   const { rows } = await query(
     `SELECT c.*, (c.publish_on IS NOT NULL AND c.publish_on <= $1::date) AS published,
-       array_length(regexp_split_to_array(COALESCE(c.commentary,''), E'\\s+'), 1) AS words,
+       array_length(regexp_split_to_array(COALESCE(c.commentary,''), '\\s+'), 1) AS words,
        COALESCE(ROUND(AVG(r.rating) FILTER (WHERE r.status='approved'), 1), 0) AS avg_rating,
        COUNT(r.id) FILTER (WHERE r.status='approved')::int AS review_count
      FROM chapters c LEFT JOIN reviews r ON r.chapter_id=c.id

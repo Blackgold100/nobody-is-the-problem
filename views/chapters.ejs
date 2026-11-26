@@ -4,6 +4,8 @@
   <div class="eyebrow"><%= site.book_title %></div>
   <h1 style="font-size: 40px; margin: 8px 0 8px">Contents</h1>
   <p class="muted" style="max-width: 640px; font-size: 17px">The complete book, online.<% if (!user || !user.has_pass) { %> The Preface, Prologue and free chapters are open to everyone; <a href="/pass">a donation of any amount from <%= naira(site.donation_min_ngn) %></a> unlocks the rest.<% } %></p>
+  <% if (site.dedication) { %><blockquote class="dedication"><%- site.dedication.split('\n').map(function (l) { return l.replace(/[&<>"]/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]; }); }).join('<br>') %></blockquote><% } %>
   <div style="margin-top: 28px"><%- include('partials/chapter-list', { chapters: chapters, grouped: true }) %></div>
+  <% if (site.copyright_notice) { %><section class="copyright-notice" aria-label="Copyright"><% site.copyright_notice.split(/\n{2,}/).forEach(function (p) { %><p><%= p %></p><% }) %></section><% } %>
 </main>
 <%- include('partials/foot') %>

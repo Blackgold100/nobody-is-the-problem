@@ -21,6 +21,8 @@
     <div class="field"><label for="blurb">Home page introduction</label><textarea id="blurb" name="blurb" rows="4"><%= site.blurb %></textarea></div>
     <div class="field"><label for="author_bio">About the author</label><textarea id="author_bio" name="author_bio" rows="4" placeholder="Shown on the home page. Leave empty to hide."><%= site.author_bio %></textarea></div>
     <div class="field"><label for="subtitle">Subtitle</label><input id="subtitle" name="subtitle" type="text" value="<%= site.subtitle %>"></div>
+    <div class="field"><label for="dedication">Dedication</label><textarea id="dedication" name="dedication" rows="2"><%= site.dedication %></textarea></div>
+    <div class="field"><label for="copyright_notice">Copyright page</label><textarea id="copyright_notice" name="copyright_notice" rows="5"><%= site.copyright_notice %></textarea><span class="hint">Shown at the bottom of the Contents page.</span></div>
     <h2 style="font-size: 20px; margin-top: 8px" id="bank">Donation account</h2>
     <p class="muted" style="margin: 0; font-size: 14px">Readers transfer to this account, then tell the site they've paid. You confirm each one under <a href="/admin/payments">Donations</a>.</p>
     <div class="form-grid">

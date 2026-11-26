@@ -205,7 +205,7 @@ router.get('/subscribers.csv', wrap(async (req, res) => {
 
 // ---------- Settings ----------
 const SETTINGS = ['book_title', 'subtitle', 'author_name', 'tagline', 'blurb', 'author_bio', 'donation_min_ngn', 'donation_suggested', 'pass_name', 'amazon_url', 'selar_url', 'contact_email',
-  'bank_name', 'bank_account_name', 'bank_account_number', 'bank_instructions', 'bank_instant_unlock', 'whatsapp_number'];
+  'bank_name', 'bank_account_name', 'bank_account_number', 'bank_instructions', 'bank_instant_unlock', 'whatsapp_number', 'dedication', 'copyright_notice'];
 router.get('/settings', (req, res) => res.render('admin/settings', { title: 'Site settings', paystackOn: !!process.env.PAYSTACK_SECRET_KEY }));
 
 router.post('/settings', wrap(async (req, res) => {
@@ -226,6 +226,7 @@ router.post('/settings', wrap(async (req, res) => {
     amazon_url: h.safeUrl(b.amazon_url) || '', selar_url: h.safeUrl(b.selar_url) || '', contact_email: h.str(b.contact_email, 200),
     subtitle: h.str(b.subtitle, 200), bank_name: h.str(b.bank_name, 80), bank_account_name: h.str(b.bank_account_name, 120), bank_account_number: acct,
     bank_instructions: h.str(b.bank_instructions, 500), bank_instant_unlock: b.bank_instant_unlock === 'yes' ? 'yes' : 'no', whatsapp_number: wa,
+    dedication: h.str(b.dedication, 1000), copyright_notice: h.str(b.copyright_notice, 3000),
   };
   for (const k of SETTINGS) {
     // eslint-disable-next-line no-await-in-loop
