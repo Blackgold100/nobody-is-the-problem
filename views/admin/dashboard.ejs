@@ -1,0 +1,43 @@
+<%- include('../partials/head') %>
+<main class="wrap page">
+  <%- include('../partials/flash') %>
+  <div class="page-head"><div><h1>Author dashboard</h1><p class="muted" style="margin: 4px 0 0">Readers, donations and reviews at a glance.</p></div>
+    <a class="btn btn-outline" href="/admin/payments">Donations</a></div>
+  <% if (!site.bank_account_number) { %><div class="alert alert-info" style="margin: 0"><strong>Add your donation account.</strong> Readers can't donate until you enter your bank details in <a href="/admin/settings#bank">Settings</a>.</div><% } %>
+  <% if (s.pending_transfers) { %><div class="alert alert-info" style="margin: 0"><strong><%= s.pending_transfers %> transfer<%= s.pending_transfers === 1 ? '' : 's' %> to confirm.</strong> <a href="/admin/payments">Check them against your bank app →</a></div><% } %>
+  <section class="stats">
+    <div class="card stat"><div class="label">Donations</div><div class="value"><%= naira(s.revenue) %></div><div class="muted" style="font-size: 14px"><%= s.sales %> donation<%= s.sales === 1 ? '' : 's' %></div></div>
+    <div class="card stat"><div class="label">Readers</div><div class="value"><%= s.readers %></div><div class="muted" style="font-size: 14px"><%= s.pass_holders %> with all chapters unlocked</div></div>
+    <div class="card stat"><div class="label">Average rating</div><div class="value"><%= Number(s.avg_rating).toFixed(1) %></div><div class="muted" style="font-size: 14px"><a href="/admin/reviews"><%= s.pending_reviews %> review<%= s.pending_reviews === 1 ? '' : 's' %> to read</a></div></div>
+    <div class="card stat"><div class="label">Email list</div><div class="value"><%= s.subscribers %></div><div class="muted" style="font-size: 14px"><a href="/admin/subscribers.csv">Download CSV</a></div></div>
+  </section>
+  <div class="grid-2" style="align-items: start">
+    <section class="card">
+      <h2 style="font-size: 20px; margin-bottom: 8px">Reviews waiting for you</h2>
+      <% if (!pending.length) { %><p class="muted" style="margin: 0">All caught up.</p><% } %>
+      <% pending.forEach(function (r) { %>
+        <div class="review">
+          <div class="review-head"><span><strong><%= r.name %></strong> · <%= chLabel(r) %> · <%- include('../partials/stars', { value: r.rating }) %></span></div>
+          <p><%= r.body %></p>
+          <div class="form-actions" style="margin-top: 8px">
+            <form method="post" action="/admin/reviews/<%= r.id %>/status" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="status" value="approved"><input type="hidden" name="back" value="/admin"><button class="btn btn-primary btn-sm" type="submit">Publish</button></form>
+            <form method="post" action="/admin/reviews/<%= r.id %>/status" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="status" value="hidden"><input type="hidden" name="back" value="/admin"><button class="btn btn-outline btn-sm" type="submit">Hide</button></form>
+          </div>
+        </div>
+      <% }) %>
+    </section>
+    <div class="stack">
+      <section class="card">
+        <h2 style="font-size: 20px; margin-bottom: 8px">Coming up</h2>
+        <% if (!upcoming.length) { %><p class="muted" style="margin: 0">No chapters scheduled. <a href="/admin/chapters/new">Write the next one</a>.</p><% } %>
+        <% upcoming.forEach(function (c) { %><div style="display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line-2)"><a href="/admin/chapters/<%= c.id %>"><%= chLabel(c) %>: <%= c.title %></a><span class="pill <%= c.publish_on ? 'pill-soon' : 'pill-lock' %>"><%= c.publish_on ? longDate(c.publish_on) : 'Draft' %></span></div><% }) %>
+      </section>
+      <section class="card">
+        <h2 style="font-size: 20px; margin-bottom: 8px">Latest confirmed donations</h2>
+        <% if (!payments.length) { %><p class="muted" style="margin: 0">No donations yet.</p><% } %>
+        <% payments.forEach(function (p) { %><div style="padding: 8px 0; border-top: 1px solid var(--line-2); font-size: 15px"><div style="display: flex; justify-content: space-between; gap: 12px"><span><%= p.name || p.email %></span><span><%= naira(p.amount_kobo / 100) %> · <span class="muted"><%= longDate(p.paid_on || p.paid_at) %></span></span></div><% if (p.message) { %><div class="muted" style="font-size: 14px; font-style: italic">“<%= p.message %>”</div><% } %></div><% }) %>
+      </section>
+    </div>
+  </div>
+</main>
+<%- include('../partials/foot') %>

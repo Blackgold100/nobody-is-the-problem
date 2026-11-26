@@ -1,0 +1,21 @@
+<%- include('../partials/head') %>
+<main class="wrap page" style="max-width: 900px">
+  <%- include('../partials/flash') %>
+  <div class="page-head"><div><h1>Reader reviews</h1><p class="muted" style="margin: 4px 0 0">Reviews appear on the site only after you publish them. Featured ones show on the home page.</p></div></div>
+  <nav class="tabs" aria-label="Filter"><% ['pending', 'approved', 'hidden'].forEach(function (s) { %><a href="/admin/reviews?status=<%= s %>" aria-current="<%= status === s ? 'true' : 'false' %>"><%= { pending: 'Waiting', approved: 'Published', hidden: 'Hidden' }[s] %></a><% }) %></nav>
+  <section class="card">
+    <% if (!reviews.length) { %><div class="empty">Nothing here.</div><% } %>
+    <% reviews.forEach(function (r) { %>
+      <div class="review">
+        <div class="review-head"><span><strong><%= r.name %></strong> (<%= r.email %>) on <a href="/chapters/<%= r.slug %>" target="_blank" rel="noopener"><%= chLabel(r) %></a> · <%- include('../partials/stars', { value: r.rating }) %> <%= r.featured ? '· Featured' : '' %></span><span><%= longDate(r.created_at) %></span></div>
+        <p><%= r.body %></p>
+        <div class="form-actions" style="margin-top: 10px">
+          <% if (r.status !== 'approved') { %><form method="post" action="/admin/reviews/<%= r.id %>/status" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="status" value="approved"><input type="hidden" name="back" value="/admin/reviews?status=<%= status %>"><button class="btn btn-primary btn-sm" type="submit">Publish</button></form><% } %>
+          <% if (r.status === 'approved') { %><form method="post" action="/admin/reviews/<%= r.id %>/feature" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="back" value="/admin/reviews?status=approved"><button class="btn btn-outline btn-sm" type="submit"><%= r.featured ? 'Unfeature' : 'Feature on home page' %></button></form><% } %>
+          <% if (r.status !== 'hidden') { %><form method="post" action="/admin/reviews/<%= r.id %>/status" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="status" value="hidden"><input type="hidden" name="back" value="/admin/reviews?status=<%= status %>"><button class="btn btn-outline btn-sm" type="submit">Hide</button></form><% } %>
+        </div>
+      </div>
+    <% }) %>
+  </section>
+</main>
+<%- include('../partials/foot') %>

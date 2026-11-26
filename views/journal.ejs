@@ -1,0 +1,16 @@
+<%- include('partials/head') %>
+<main class="narrow section">
+  <h1 style="font-size: 34px; margin-bottom: 8px">My reflections</h1>
+  <p class="muted">Your private notes on each chapter. Only you can see these.</p>
+  <% if (!entries.length) { %>
+    <div class="card empty">You haven't written any reflections yet. Open a chapter and answer its questions to start.</div>
+  <% } else { entries.forEach(function (e) { %>
+    <section class="card" style="margin-bottom: 16px">
+      <div class="eyebrow"><%= chLabel(e) %></div>
+      <h2 style="font-size: 22px; margin: 4px 0 10px"><a href="/chapters/<%= e.slug %>#journal" style="color: inherit; text-decoration: none"><%= e.title %></a></h2>
+      <p style="white-space: pre-line; margin: 0"><%= e.body %></p>
+      <p class="hint" style="margin: 10px 0 0">Updated <%= longDate(e.updated_at) %> · <a href="/chapters/<%= e.slug %>#journal">Edit</a></p>
+    </section>
+  <% }) } %>
+</main>
+<%- include('partials/foot') %>

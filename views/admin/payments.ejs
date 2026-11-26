@@ -1,0 +1,55 @@
+<%- include('../partials/head') %>
+<main class="wrap page">
+  <%- include('../partials/flash') %>
+  <div class="page-head"><div><h1>Donations</h1><p class="muted" style="margin: 4px 0 0">Check each transfer against your bank app, then confirm it to unlock the book for that reader.</p></div>
+    <a class="btn btn-outline btn-sm" href="/admin/settings#bank">Account details</a></div>
+  <% const pend = payments.filter(function (p) { return p.status === 'pending'; }); const rest = payments.filter(function (p) { return p.status !== 'pending'; }); %>
+  <section class="card">
+    <h2 style="font-size: 20px; margin-bottom: 12px">Waiting for you <span class="pill pill-soon"><%= pend.length %></span></h2>
+    <% if (!pend.length) { %><div class="empty" style="padding: 12px">Nothing to confirm.</div><% } %>
+    <% pend.forEach(function (p) { %>
+      <div class="review" style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start">
+        <div style="flex: 1 1 320px">
+          <div style="font-size: 22px; font-family: var(--serif); font-weight: 600"><%= naira(p.amount_kobo / 100) %> <span class="muted" style="font-size: 15px; font-family: var(--sans); font-weight: 400">sent <%= longDate(p.paid_on) %></span></div>
+          <div>From <strong><%= p.sender_name %></strong> · reader <%= p.name %> (<%= p.email %>)</div>
+          <div class="muted" style="font-size: 14px">Reference <code><%= p.reference.split('-').slice(0, 2).join('-') %></code> · submitted <%= longDate(p.created_at) %><%= p.has_pass ? ' · already has access' : '' %></div>
+          <% if (p.message) { %><div class="muted" style="font-size: 14px; font-style: italic; margin-top: 4px">“<%= p.message %>”</div><% } %>
+          <% if (p.proof_id) { %><p style="margin: 8px 0 0"><a href="/admin/payments/<%= p.id %>/proof" target="_blank" rel="noopener">View receipt ↗</a></p><% } else { %><p class="muted" style="margin: 8px 0 0; font-size: 14px">No receipt uploaded.</p><% } %>
+        </div>
+        <div class="stack" style="gap: 8px; flex: 0 1 300px">
+          <form method="post" action="/admin/payments/<%= p.id %>/confirm" style="display: flex; gap: 8px; align-items: flex-end">
+            <input type="hidden" name="_csrf" value="<%= csrf %>">
+            <div class="field" style="flex: 1"><label for="amt-<%= p.id %>" style="font-size: 12px">Amount received (₦)</label><input id="amt-<%= p.id %>" name="amount" type="text" inputmode="numeric" value="<%= p.amount_kobo / 100 %>"></div>
+            <button class="btn btn-primary btn-sm" type="submit" style="min-height: 46px">Confirm</button>
+          </form>
+          <form method="post" action="/admin/payments/<%= p.id %>/reject" style="display: flex; gap: 8px" data-confirm="Mark this transfer as not received? If the reader has no other confirmed donation, their access is removed.">
+            <input type="hidden" name="_csrf" value="<%= csrf %>">
+            <input name="note" type="text" maxlength="300" placeholder="Reason (shown to the reader)" aria-label="Reason">
+            <button class="btn btn-danger btn-sm" type="submit" style="min-height: 46px">Not received</button>
+          </form>
+        </div>
+      </div>
+    <% }) %>
+  </section>
+  <section class="card">
+    <h2 style="font-size: 20px; margin-bottom: 12px">All donations</h2>
+    <% if (!rest.length) { %><div class="empty">No donations yet.</div><% } else { %>
+    <div class="table-wrap"><table class="data" style="min-width: 760px">
+      <thead><tr><th>Date</th><th>Reader</th><th>From</th><th>Method</th><th>Status</th><th class="r">Amount</th></tr></thead>
+      <tbody>
+      <% rest.forEach(function (p) { %>
+        <tr>
+          <td class="muted" style="white-space: nowrap"><%= longDate(p.paid_on || p.paid_at || p.created_at) %></td>
+          <td><%= p.name || '—' %><div class="muted" style="font-size: 13px"><%= p.email || '' %></div><% if (p.message) { %><div class="muted" style="font-size: 13px; font-style: italic">“<%= p.message %>”</div><% } %></td>
+          <td><%= p.sender_name || '—' %><% if (p.proof_id) { %><div><a href="/admin/payments/<%= p.id %>/proof" target="_blank" rel="noopener" style="font-size: 13px">Receipt</a></div><% } %></td>
+          <td><%= p.method === 'bank' ? 'Bank transfer' : 'Card (Paystack)' %></td>
+          <td><span class="pill <%= p.status === 'success' ? 'pill-free' : (p.status === 'failed' || p.status === 'rejected') ? 'pill-bad' : 'pill-lock' %>"><%= { success: 'Confirmed', initialized: 'Started', failed: 'Failed', abandoned: 'Abandoned', rejected: 'Not received' }[p.status] %></span><% if (p.review_note) { %><div class="muted" style="font-size: 13px"><%= p.review_note %></div><% } %></td>
+          <td class="r" style="font-weight: 600"><%= naira(p.amount_kobo / 100) %></td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table></div>
+    <% } %>
+  </section>
+</main>
+<%- include('../partials/foot') %>

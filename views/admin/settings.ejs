@@ -1,0 +1,53 @@
+<%- include('../partials/head') %>
+<main class="wrap page" style="max-width: 900px">
+  <%- include('../partials/flash') %>
+  <div class="page-head"><div><h1>Site settings</h1></div></div>
+  <section class="card" style="display: flex; gap: 24px; align-items: center; flex-wrap: wrap">
+    <img class="cover" src="/cover" alt="Current book cover" style="max-width: 120px; box-shadow: none">
+    <form method="post" action="/admin/settings/cover" enctype="multipart/form-data" class="stack" style="flex: 1 1 300px; gap: 10px">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <div class="field"><label for="cover">Book cover</label><input id="cover" name="cover" type="file" accept="image/png,image/jpeg,image/webp" required><span class="hint">Portrait image (2:3), PNG/JPG/WEBP, under 4 MB.</span></div>
+      <div><button class="btn btn-outline btn-sm" type="submit">Upload cover</button></div>
+    </form>
+  </section>
+  <form method="post" action="/admin/settings" class="card stack">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <h2 style="font-size: 20px">Book &amp; author</h2>
+    <div class="form-grid">
+      <div class="field"><label for="book_title">Book title</label><input id="book_title" name="book_title" type="text" value="<%= site.book_title %>"></div>
+      <div class="field"><label for="author_name">Author name</label><input id="author_name" name="author_name" type="text" value="<%= site.author_name %>"></div>
+    </div>
+    <div class="field"><label for="tagline">Tagline</label><input id="tagline" name="tagline" type="text" value="<%= site.tagline %>"><span class="hint">Used for search results and link previews on WhatsApp and social media.</span></div>
+    <div class="field"><label for="blurb">Home page introduction</label><textarea id="blurb" name="blurb" rows="4"><%= site.blurb %></textarea></div>
+    <div class="field"><label for="author_bio">About the author</label><textarea id="author_bio" name="author_bio" rows="4" placeholder="Shown on the home page. Leave empty to hide."><%= site.author_bio %></textarea></div>
+    <div class="field"><label for="subtitle">Subtitle</label><input id="subtitle" name="subtitle" type="text" value="<%= site.subtitle %>"></div>
+    <h2 style="font-size: 20px; margin-top: 8px" id="bank">Donation account</h2>
+    <p class="muted" style="margin: 0; font-size: 14px">Readers transfer to this account, then tell the site they've paid. You confirm each one under <a href="/admin/payments">Donations</a>.</p>
+    <div class="form-grid">
+      <div class="field"><label for="bank_name">Bank</label><input id="bank_name" name="bank_name" type="text" value="<%= site.bank_name %>" placeholder="e.g. Access Bank"></div>
+      <div class="field"><label for="bank_account_number">Account number</label><input id="bank_account_number" name="bank_account_number" type="text" inputmode="numeric" value="<%= site.bank_account_number %>" placeholder="10 digits"></div>
+    </div>
+    <div class="field"><label for="bank_account_name">Account name</label><input id="bank_account_name" name="bank_account_name" type="text" value="<%= site.bank_account_name %>" placeholder="Exactly as the bank shows it"></div>
+    <div class="field"><label for="bank_instructions">Note under the account details</label><input id="bank_instructions" name="bank_instructions" type="text" value="<%= site.bank_instructions %>"></div>
+    <div class="form-grid">
+      <div class="field"><span class="label-txt">When a reader says they've paid</span>
+        <label class="check"><input type="radio" name="bank_instant_unlock" value="no" <%= site.bank_instant_unlock !== 'yes' ? 'checked' : '' %>> Unlock after I confirm (safest)</label>
+        <label class="check"><input type="radio" name="bank_instant_unlock" value="yes" <%= site.bank_instant_unlock === 'yes' ? 'checked' : '' %>> Unlock straight away; I check later</label></div>
+      <div class="field"><label for="whatsapp_number">WhatsApp number for donation questions <span class="muted" style="font-weight: 400">(optional)</span></label><input id="whatsapp_number" name="whatsapp_number" type="text" inputmode="tel" value="<%= site.whatsapp_number %>" placeholder="2348012345678"><span class="hint">International format, no +.</span></div>
+    </div>
+    <h2 style="font-size: 20px; margin-top: 8px">Donation amounts</h2>
+    <input type="hidden" name="pass_name" value="<%= site.pass_name %>">
+    <div class="form-grid">
+      <div class="field"><label for="donation_min_ngn">Minimum donation to unlock (₦)</label><input id="donation_min_ngn" name="donation_min_ngn" type="text" inputmode="numeric" value="<%= site.donation_min_ngn %>"><span class="hint">Readers can give more. Changing it doesn't affect people who've already donated.</span></div>
+      <div class="field"><label for="donation_suggested">Suggested amounts (₦)</label><input id="donation_suggested" name="donation_suggested" type="text" value="<%= site.donation_suggested %>"><span class="hint">Up to 4, separated by commas, e.g. 1000, 2500, 5000.</span></div>
+    </div>
+    <div class="form-grid">
+      <div class="field"><label for="amazon_url">Amazon book link</label><input id="amazon_url" name="amazon_url" type="url" value="<%= site.amazon_url %>" placeholder="https://www.amazon.com/dp/..."></div>
+      <div class="field"><label for="selar_url">Selar book link</label><input id="selar_url" name="selar_url" type="url" value="<%= site.selar_url %>" placeholder="https://selar.com/..."></div>
+    </div>
+    <div class="field"><label for="contact_email">Contact email</label><input id="contact_email" name="contact_email" type="email" value="<%= site.contact_email %>"><span class="hint">Shown in the footer and for password help.</span></div>
+    <% if (paystackOn) { %><p class="muted" style="margin: 0; font-size: 14px">Card payments (Paystack) are also switched on, because PAYSTACK_SECRET_KEY is set.</p><% } %>
+    <div class="form-actions"><button class="btn btn-primary" type="submit">Save settings</button></div>
+  </form>
+</main>
+<%- include('../partials/foot') %>

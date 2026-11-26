@@ -1,0 +1,100 @@
+<%- include('partials/head') %>
+<% const released = chapters.filter(function (c) { return c.published; });
+   const freeCh = released.find(function (c) { return c.is_free; });
+   const nextCh = chapters.find(function (c) { return !c.published; }); %>
+<main>
+  <section class="hero dark">
+    <div class="wrap">
+      <div class="hero-text">
+        <%- include('partials/flash') %>
+        <div class="eyebrow">Read the complete book online</div>
+        <h1 style="margin-top: 14px"><%= site.book_title %></h1>
+        <% if (site.subtitle) { %><p class="subtitle"><%= site.subtitle %></p><% } %>
+        <div class="rule">BY <%= site.author_name.toUpperCase() %></div>
+        <p class="lede"><%= site.blurb %></p>
+        <div class="cta-row">
+          <% if (lastRead) { %><a class="btn btn-gold" href="/chapters/<%= lastRead.slug %>">Continue: <%= chLabel(lastRead) %></a>
+          <% } else if (freeCh) { %><a class="btn btn-gold" href="/chapters/<%= freeCh.slug %>">Start reading free</a><% } %>
+          <% if (!user || !user.has_pass) { %><a class="btn btn-ghost-light" href="/pass">Donate to unlock the book</a><% } else { %><a class="btn btn-ghost-light" href="/chapters">Contents</a><% } %>
+        </div>
+        <div class="hero-facts">
+          <div><strong><%= released.filter(function (c) { return /^Chapter /.test(c.label || 'Chapter '); }).length %></strong>chapters</div>
+          <div><strong>5</strong>parts</div>
+          <div><strong><%= released.filter(function (c) { return c.is_free; }).length %></strong>free sections</div>
+          <% if (supporters > 0) { %><div><strong><%= supporters %></strong>supporter<%= supporters === 1 ? '' : 's' %></div><% } %>
+        </div>
+        <% if (site.amazon_url || site.selar_url) { %>
+        <p class="muted" style="margin-top: 18px; font-size: 15px">Prefer a copy of your own?
+          <% if (site.amazon_url) { %><a href="<%= site.amazon_url %>" target="_blank" rel="noopener">Amazon</a><% } %>
+          <% if (site.amazon_url && site.selar_url) { %> · <% } %>
+          <% if (site.selar_url) { %><a href="<%= site.selar_url %>" target="_blank" rel="noopener">Selar</a><% } %>
+        </p>
+        <% } %>
+      </div>
+      <div class="hero-cover"><img class="cover" src="/cover" alt="Cover of <%= site.book_title %> by <%= site.author_name %>" width="320" height="480"></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 24px">
+    <div class="wrap">
+      <div class="grid-3">
+        <div class="card"><div class="eyebrow">Read</div><h3 style="margin: 8px 0 6px">The whole book, online</h3><p class="muted" style="margin: 0">The Preface, Prologue and Chapter One are free. A donation of any amount from <%= naira(site.donation_min_ngn) %> unlocks all 24 chapters and the Epilogue.</p></div>
+        <div class="card"><div class="eyebrow">Reflect</div><h3 style="margin: 8px 0 6px">Your private journal</h3><p class="muted" style="margin: 0">Answer each chapter's reflection questions in notes only you can see, and come back to them.</p></div>
+        <div class="card"><div class="eyebrow">Share</div><h3 style="margin: 8px 0 6px">Reviews &amp; quote cards</h3><p class="muted" style="margin: 0">Rate each chapter, read what others took from it, and share favourite lines as image cards.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 0">
+    <div class="wrap">
+      <div class="page-head" style="margin-bottom: 20px">
+        <div><div class="eyebrow">Contents</div><h2 style="margin-top: 6px">Begin here</h2></div>
+        <% if (nextCh) { %><span class="muted">Next: <%= chLabel(nextCh) %> on <%= longDate(nextCh.publish_on) %></span><% } %>
+      </div>
+      <%- include('partials/chapter-list', { chapters: chapters.slice(0, 5), grouped: false }) %>
+      <% if (chapters.length > 5) { %><p style="margin-top: 16px"><a class="btn btn-outline" href="/chapters">See the full contents (<%= chapters.length %> sections) →</a></p><% } %>
+    </div>
+  </section>
+
+  <% if (testimonials.length) { %>
+  <section class="section" style="padding-top: 0">
+    <div class="wrap">
+      <div class="eyebrow">From readers</div>
+      <div class="grid-3" style="margin-top: 16px">
+        <% testimonials.forEach(function (t) { %>
+        <figure class="card" style="margin: 0">
+          <%- include('partials/stars', { value: t.rating }) %>
+          <blockquote class="testimonial" style="margin: 10px 0 14px">“<%= t.body.length > 240 ? t.body.slice(0, 237) + '…' : t.body %>”</blockquote>
+          <figcaption class="muted" style="font-size: 14px"><strong style="color: var(--ink)"><%= t.name.split(' ')[0] %></strong> on <%= chLabel(t) %></figcaption>
+        </figure>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+  <% } %>
+
+  <% if (site.author_bio) { %>
+  <section class="section" style="padding-top: 0">
+    <div class="narrow">
+      <div class="eyebrow">About the author</div>
+      <h2 style="margin: 6px 0 12px"><%= site.author_name %></h2>
+      <p class="muted" style="font-size: 17px; white-space: pre-line"><%= site.author_bio %></p>
+    </div>
+  </section>
+  <% } %>
+
+  <section class="section" id="subscribe" style="padding-top: 0">
+    <div class="wrap">
+      <div class="subscribe">
+        <div style="flex: 1 1 300px"><h2>Join the conversation</h2><p>Occasional emails from the author: new reflections, events and readers’ discussions. No spam.</p></div>
+        <form method="post" action="/subscribe">
+          <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="back" value="/">
+          <label class="sr-only" for="sub-email">Email address</label>
+          <input id="sub-email" type="email" name="email" required placeholder="you@example.com" autocomplete="email">
+          <button class="btn" type="submit">Notify me</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+<%- include('partials/foot') %>

@@ -1,0 +1,9 @@
+<%- include('partials/head') %>
+<main class="wrap section" style="max-width: 900px">
+  <%- include('partials/flash') %>
+  <div class="eyebrow"><%= site.book_title %></div>
+  <h1 style="font-size: 40px; margin: 8px 0 8px">Contents</h1>
+  <p class="muted" style="max-width: 640px; font-size: 17px">The complete book, online.<% if (!user || !user.has_pass) { %> The Preface, Prologue and free chapters are open to everyone; <a href="/pass">a donation of any amount from <%= naira(site.donation_min_ngn) %></a> unlocks the rest.<% } %></p>
+  <div style="margin-top: 28px"><%- include('partials/chapter-list', { chapters: chapters, grouped: true }) %></div>
+</main>
+<%- include('partials/foot') %>

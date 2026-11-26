@@ -1,0 +1,23 @@
+<%- include('partials/head') %>
+<main class="narrow section">
+  <%- include('partials/flash') %>
+  <h1 style="font-size: 34px; margin-bottom: 20px">My account</h1>
+  <div class="card stack">
+    <div><div class="label-txt">Name</div><div><%= user.name %></div></div>
+    <div><div class="label-txt">Email</div><div><%= user.email %></div></div>
+    <div><div class="label-txt">Book access</div>
+      <% if (user.has_pass) { %><div><span class="pill pill-teal">All chapters unlocked</span> since <%= longDate(user.pass_granted_at) %></div>
+      <% } else { %><div class="muted">Free chapters only. <a href="/pass">Donate from <%= naira(site.donation_min_ngn) %> to unlock every chapter</a></div><% } %>
+    </div>
+    <% if (payments.length) { %>
+    <div><div class="label-txt">Your donations</div>
+      <% payments.forEach(function (p) { %><div class="muted" style="font-size: 15px"><%= longDate(p.paid_on || p.paid_at || p.created_at) %> · <%= naira(p.amount_kobo / 100) %> · <span class="pill <%= p.status === 'success' ? 'pill-free' : p.status === 'pending' ? 'pill-soon' : 'pill-bad' %>"><%= { success: 'Confirmed', pending: 'Awaiting confirmation', rejected: 'Not found' }[p.status] %></span><% if (p.status === 'rejected' && p.review_note) { %> <em><%= p.review_note %></em><% } %></div><% }) %>
+    </div>
+    <% } %>
+    <div class="form-actions">
+      <a class="btn btn-outline btn-sm" href="/account/password">Change password</a>
+      <form method="post" action="/logout" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn btn-outline btn-sm" type="submit">Sign out</button></form>
+    </div>
+  </div>
+</main>
+<%- include('partials/foot') %>

@@ -1,0 +1,13 @@
+<footer class="site-foot">
+  <div class="wrap">
+    <span>© <%= new Date().getFullYear() %> <%= site.author_name %> · <%= site.book_title %></span>
+    <span style="display: flex; gap: 14px; flex-wrap: wrap">
+      <% if (site.amazon_url) { %><a href="<%= site.amazon_url %>" rel="noopener" target="_blank">Buy on Amazon</a><% } %>
+      <% if (site.selar_url) { %><a href="<%= site.selar_url %>" rel="noopener" target="_blank">Buy on Selar</a><% } %>
+      <% if (site.contact_email) { %><a href="mailto:<%= site.contact_email %>">Contact</a><% } %>
+    </span>
+  </div>
+</footer>
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<%- include('../partials/head') %>
+<main class="wrap page">
+  <%- include('../partials/flash') %>
+  <div class="page-head"><div><h1>Readers</h1><p class="muted" style="margin: 4px 0 0">Give free access (e.g. to reviewers or friends) or reset a forgotten password.</p></div></div>
+  <% if (tempPassword) { %><div class="alert alert-success">New one-time password for <strong><%= tempPassword.email %></strong>: <code style="font-size: 17px"><%= tempPassword.password %></code>. Shown once; they'll choose a new one at sign-in.</div><% } %>
+  <form method="get" action="/admin/readers" style="display: flex; gap: 10px; flex-wrap: wrap"><label class="sr-only" for="q">Search</label><input id="q" type="search" name="q" value="<%= q %>" placeholder="Search name or email" style="flex: 1 1 260px; width: auto"><button class="btn btn-outline" type="submit">Search</button></form>
+  <section class="card">
+    <% if (!readers.length) { %><div class="empty">No readers yet.</div><% } else { %>
+    <div class="table-wrap"><table class="data" style="min-width: 720px">
+      <thead><tr><th>Name</th><th>Email</th><th>Access</th><th>Joined</th><th class="r">Actions</th></tr></thead>
+      <tbody>
+      <% readers.forEach(function (r) { %>
+        <tr>
+          <td style="font-weight: 600"><%= r.name %></td><td><%= r.email %></td>
+          <td><% if (r.has_pass) { %><span class="pill pill-teal"><%= r.pass_source === 'gift' ? 'Free access' : 'Donated' %></span><% } else { %><span class="muted">—</span><% } %></td>
+          <td class="muted"><%= longDate(r.created_at) %></td>
+          <td class="r" style="white-space: nowrap">
+            <form method="post" action="/admin/readers/<%= r.id %>/pass" class="inline" <%- r.has_pass ? 'data-confirm="Remove this reader\'s access?"' : '' %>><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="grant" value="<%= r.has_pass ? '0' : '1' %>"><button class="btn btn-outline btn-sm" type="submit"><%= r.has_pass ? 'Remove access' : 'Give free access' %></button></form>
+            <form method="post" action="/admin/readers/<%= r.id %>/reset-password" class="inline" data-confirm="Reset this reader's password?"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn-link" type="submit">Reset password</button></form>
+          </td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table></div>
+    <% } %>
+  </section>
+</main>
+<%- include('../partials/foot') %>

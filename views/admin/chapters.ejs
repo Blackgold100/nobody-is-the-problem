@@ -1,0 +1,25 @@
+<%- include('../partials/head') %>
+<main class="wrap page">
+  <%- include('../partials/flash') %>
+  <div class="page-head"><div><h1>Chapters</h1><p class="muted" style="margin: 4px 0 0">Set a publish date and each chapter goes live on its own that day. You can release them all at once or one at a time.</p></div><a class="btn btn-primary" href="/admin/chapters/new">Add a chapter</a></div>
+  <section class="card">
+    <% if (!chapters.length) { %><div class="empty">No chapters yet. <a href="/admin/chapters/new">Write the first one</a>. Tip: make Chapter 1 free so new readers can start straight away.</div><% } else { %>
+    <div class="table-wrap"><table class="data">
+      <thead><tr><th>#</th><th>Title</th><th>Status</th><th>Access</th><th class="r">Reviews</th><th></th></tr></thead>
+      <tbody>
+      <% chapters.forEach(function (c) { const live = c.publish_on && c.publish_on <= today; %>
+        <tr>
+          <td><%= c.number %></td>
+          <td style="font-weight: 600"><%= c.title %></td>
+          <td><span class="pill <%= live ? 'pill-free' : c.publish_on ? 'pill-soon' : 'pill-lock' %>"><%= live ? 'Live since ' + longDate(c.publish_on) : c.publish_on ? 'Scheduled ' + longDate(c.publish_on) : 'Draft' %></span></td>
+          <td><%= c.is_free ? 'Free' : 'Donation' %></td>
+          <td class="r"><%= c.reviews %><%= c.reviews ? ' · ' + Number(c.avg_rating).toFixed(1) + '★' : '' %></td>
+          <td class="r" style="white-space: nowrap"><a class="btn btn-outline btn-sm" href="/admin/chapters/<%= c.id %>">Edit</a> <a class="btn btn-outline btn-sm" href="/chapters/<%= c.slug %>" target="_blank" rel="noopener">View</a></td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table></div>
+    <% } %>
+  </section>
+</main>
+<%- include('../partials/foot') %>

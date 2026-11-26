@@ -1,0 +1,83 @@
+<%- include('partials/head') %>
+<main class="narrow section" style="max-width: 720px">
+  <%- include('partials/flash') %>
+  <div style="text-align: center; margin-bottom: 24px">
+    <div class="eyebrow"><%= site.book_title %></div>
+    <h1 style="font-size: 38px; margin-top: 8px">Donate to read the book</h1>
+    <p class="muted" style="margin: 10px auto 0; max-width: 540px; font-size: 17px">
+      <% if (user && user.has_pass) { %>Thank you. The whole book is already unlocked for you. If you'd like to give again, the details are below.<% } else { %>Send a donation of any amount from <strong><%= naira(min) %></strong> by bank transfer. It supports the author and unlocks every chapter<%= released ? ' (all ' + released + ' sections)' : '' %> on your account.<% } %>
+    </p>
+  </div>
+
+  <% if (!bankReady) { %>
+    <div class="card" style="text-align: center">
+      <h2 style="font-size: 22px">Donations open soon</h2>
+      <p class="muted" style="margin: 8px 0 0">The author is adding the account details for donations. Please check back shortly<% if (site.contact_email) { %>, or email <a href="mailto:<%= site.contact_email %>"><%= site.contact_email %></a><% } %>.</p>
+    </div>
+  <% } else if (!user) { %>
+    <div class="card stack" style="text-align: center">
+      <ol class="steps" style="text-align: left; max-width: 460px; margin: 0 auto">
+        <li><span><strong>Create a free account</strong> so we know whose book to unlock.</span></li>
+        <li><span><strong>Transfer any amount</strong> from <%= naira(min) %> to the author's account.</span></li>
+        <li><span><strong>Tell us you've paid</strong> (with a receipt screenshot if you have one). The book unlocks once the transfer is confirmed.</span></li>
+      </ol>
+      <div><a class="btn btn-clay" href="/signup?next=/pass">Create a free account</a></div>
+      <p class="muted" style="margin: 0; font-size: 14px">Already have one? <a href="/login?next=/pass">Sign in</a> to see the account details and your reference.</p>
+    </div>
+  <% } else { %>
+    <% if (pending) { %>
+      <div class="alert alert-info"><strong>Waiting for confirmation:</strong> your transfer of <%= naira(pending.amount_kobo / 100) %> (sent <%= longDate(pending.paid_on) %>) is with the author. The book unlocks on your account as soon as it's confirmed.</div>
+    <% } %>
+    <section class="stack" style="gap: 20px">
+      <div class="card stack" style="gap: 14px">
+        <h2 style="font-size: 22px">1. Transfer to this account</h2>
+        <div class="bank-card">
+          <div class="row"><span class="k">Bank</span><span class="v"><%= site.bank_name %></span></div>
+          <div class="row"><span class="k">Account number</span><span style="display: flex; gap: 10px; align-items: center"><span class="v big" id="acct"><%= site.bank_account_number %></span><button type="button" class="copy" data-copy="<%= site.bank_account_number %>">Copy</button></span></div>
+          <div class="row"><span class="k">Account name</span><span class="v"><%= site.bank_account_name %></span></div>
+          <div class="row"><span class="k">Your reference</span><span style="display: flex; gap: 10px; align-items: center"><span class="v big" style="font-size: 20px"><%= reference %></span><button type="button" class="copy" data-copy="<%= reference %>">Copy</button></span></div>
+        </div>
+        <p class="muted" style="margin: 0; font-size: 15px"><%= site.bank_instructions %></p>
+        <p class="muted" style="margin: 0; font-size: 14px">Suggested: <% suggested.forEach(function (a, i) { %><%= i ? ' · ' : '' %><strong><%= naira(a) %></strong><% }) %>. Any amount from <%= naira(min) %> unlocks the book.</p>
+      </div>
+
+      <form method="post" action="/pass/transfer" enctype="multipart/form-data" class="card stack" data-donate>
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <h2 style="font-size: 22px">2. Tell us you've sent it</h2>
+        <fieldset style="border: 0; padding: 0; margin: 0">
+          <legend class="label-txt" style="margin-bottom: 8px">Amount you sent</legend>
+          <div class="amounts">
+            <% suggested.forEach(function (a, i) { %>
+              <input type="radio" name="preset" id="amt-<%= a %>" value="<%= a %>" <%= i === 1 || suggested.length === 1 ? 'checked' : '' %>><label for="amt-<%= a %>"><%= naira(a) %></label>
+            <% }) %>
+            <input type="radio" name="preset" id="amt-other" value="other"><label for="amt-other">Other</label>
+          </div>
+        </fieldset>
+        <div class="form-grid">
+          <div class="field"><label for="amount">Amount (₦)</label><input id="amount" name="amount" type="text" inputmode="numeric" required value="<%= suggested[Math.min(1, suggested.length - 1)] %>" data-min="<%= min %>"></div>
+          <div class="field"><label for="paid_on">Date of transfer</label><input id="paid_on" name="paid_on" type="date" required value="<%= today %>" max="<%= today %>"></div>
+        </div>
+        <div class="field"><label for="sender_name">Name on the account you paid from</label><input id="sender_name" name="sender_name" type="text" required maxlength="120" value="<%= user.name %>" autocomplete="name"><span class="hint">This is how we find your transfer on the bank statement.</span></div>
+        <div class="field"><label for="proof">Receipt or screenshot <span class="muted" style="font-weight: 400">(optional, speeds things up)</span></label><input id="proof" name="proof" type="file" accept="image/png,image/jpeg,image/webp,application/pdf"><span class="hint">JPG, PNG or PDF, up to 5 MB.</span></div>
+        <div class="field"><label for="message">A note to the author <span class="muted" style="font-weight: 400">(optional)</span></label><input id="message" name="message" type="text" maxlength="300" placeholder="What made you want to read this book?"></div>
+        <button class="btn btn-clay" type="submit">I've made the transfer</button>
+        <p class="muted" style="margin: 0; font-size: 13px; text-align: center"><%= site.bank_instant_unlock === 'yes' ? 'The book unlocks straight away. The author checks every transfer.' : 'The author confirms transfers, usually within a few hours. You\'ll find every chapter unlocked when you next visit.' %></p>
+      </form>
+      <% if (paystackOn()) { %>
+      <form method="post" action="/pay/start" class="card stack" data-donate>
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <h2 style="font-size: 20px">Or pay by card</h2>
+        <div class="field"><label for="amount2">Amount (₦)</label><input id="amount2" name="amount" type="text" inputmode="numeric" required value="<%= suggested[Math.min(1, suggested.length - 1)] %>"></div>
+        <button class="btn btn-outline" type="submit">Pay with card</button>
+      </form>
+      <% } %>
+    </section>
+  <% } %>
+  <% if (site.whatsapp_number) { %><p class="muted" style="text-align: center; margin-top: 20px">Questions about your donation? <a href="https://wa.me/<%= site.whatsapp_number %>" target="_blank" rel="noopener">Message us on WhatsApp</a></p><% } %>
+  <% if (site.amazon_url || site.selar_url) { %>
+  <p class="muted" style="text-align: center; margin-top: 12px">Prefer your own copy?
+    <% if (site.amazon_url) { %><a href="<%= site.amazon_url %>" target="_blank" rel="noopener">Amazon</a><% } %><% if (site.amazon_url && site.selar_url) { %> · <% } %><% if (site.selar_url) { %><a href="<%= site.selar_url %>" target="_blank" rel="noopener">Selar</a><% } %>
+  </p>
+  <% } %>
+</main>
+<%- include('partials/foot') %>

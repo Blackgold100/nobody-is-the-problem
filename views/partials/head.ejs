@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= typeof title !== 'undefined' && title ? title + ' · ' : '' %><%= site.book_title %></title>
+<meta name="description" content="<%= site.tagline %>">
+<meta property="og:title" content="<%= typeof title !== 'undefined' && title ? title + ' · ' : '' %><%= site.book_title %>">
+<meta property="og:description" content="<%= site.tagline %>">
+<meta property="og:image" content="<%= (typeof baseUrl !== 'undefined' ? baseUrl : '') %>/static/og-image.jpg">
+<meta property="og:type" content="book">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#24251F">
+<link rel="icon" href="/static/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/static/cover-small.jpg">
+<link rel="preload" href="/static/fonts/cinzel-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/fonts/fonts.css">
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="/"><%= site.book_title %></a>
+    <nav class="nav" aria-label="Main">
+      <a href="/chapters" class="<%= path.startsWith('/chapters') ? 'active' : '' %>">Read the book</a>
+      <% if (user) { %>
+        <a href="/journal" class="<%= path === '/journal' ? 'active' : '' %>">My reflections</a>
+        <% if (user.role === 'author') { %><a href="/admin" class="<%= path.startsWith('/admin') ? 'active' : '' %>">Dashboard</a><% } %>
+        <a href="/account" class="<%= path === '/account' ? 'active' : '' %>">Account</a>
+        <% if (!user.has_pass) { %><a class="btn btn-gold btn-sm" href="/pass">Donate to unlock</a><% } %>
+      <% } else { %>
+        <a href="/login" class="<%= path === '/login' ? 'active' : '' %>">Sign in</a>
+        <a class="btn btn-gold btn-sm" href="/pass">Donate</a>
+      <% } %>
+    </nav>
+  </div>
+</header>
+<% if (typeof adminArea !== 'undefined' && adminArea) { %>
+<nav class="admin-bar" aria-label="Author dashboard">
+  <div class="wrap">
+    <span class="label">Author</span>
+    <a href="/admin" class="<%= path === '/admin' || path === '/admin/' ? 'active' : '' %>">Overview</a>
+    <a href="/admin/chapters" class="<%= path.startsWith('/admin/chapters') ? 'active' : '' %>">Chapters</a>
+    <a href="/admin/reviews" class="<%= path.startsWith('/admin/reviews') ? 'active' : '' %>">Reviews</a>
+    <a href="/admin/readers" class="<%= path.startsWith('/admin/readers') ? 'active' : '' %>">Readers</a>
+    <a href="/admin/payments" class="<%= path.startsWith('/admin/payments') ? 'active' : '' %>">Donations</a>
+    <a href="/admin/subscribers" class="<%= path.startsWith('/admin/subscribers') ? 'active' : '' %>">Subscribers</a>
+    <a href="/admin/settings" class="<%= path.startsWith('/admin/settings') ? 'active' : '' %>">Settings</a>
+  </div>
+</nav>
+<% } %>

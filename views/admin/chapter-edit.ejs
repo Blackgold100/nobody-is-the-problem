@@ -1,0 +1,38 @@
+<%- include('../partials/head') %>
+<main class="wrap page" style="max-width: 900px">
+  <%- include('../partials/flash') %>
+  <div class="page-head"><div><p style="margin: 0 0 4px"><a href="/admin/chapters">← All chapters</a></p><h1><%= ch.id ? 'Edit ' + chLabel(ch) : 'Add a chapter' %></h1></div>
+    <% if (ch.id) { %><a class="btn btn-outline" href="/chapters/<%= ch.slug %>" target="_blank" rel="noopener">Preview</a><% } %></div>
+  <% if (error) { %><div class="alert alert-error" role="alert"><%= error %></div><% } %>
+  <form method="post" action="<%= ch.id ? '/admin/chapters/' + ch.id : '/admin/chapters' %>" class="card stack">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <div class="form-grid" style="grid-template-columns: 110px 1fr">
+      <div class="field"><label for="number">Order</label><input id="number" name="number" type="number" min="-9" max="999" value="<%= ch.number %>"></div>
+      <div class="field"><label for="title">Title</label><input id="title" name="title" type="text" required value="<%= ch.title || '' %>"></div>
+    </div>
+    <div class="form-grid">
+      <div class="field"><label for="label">Label <span class="muted" style="font-weight: 400">(optional)</span></label><input id="label" name="label" type="text" value="<%= ch.label || '' %>" placeholder="<%= chLabel(ch) %>"><span class="hint">E.g. Preface, Prologue, Epilogue. Empty shows “Chapter” and the order number.</span></div>
+      <div class="field"><label for="part">Part <span class="muted" style="font-weight: 400">(optional)</span></label><input id="part" name="part" type="text" value="<%= ch.part || '' %>" placeholder="Part I — Seeing Differently"></div>
+    </div>
+    <div class="field"><label for="teaser">Teaser</label><textarea id="teaser" name="teaser" rows="2" placeholder="The epigraph, or one or two sentences everyone can see."><%= ch.teaser || '' %></textarea></div>
+    <div class="field"><label for="excerpt">Opening passage <span class="muted" style="font-weight: 400">(optional)</span></label><textarea id="excerpt" name="excerpt" rows="3" placeholder="A short passage shown to everyone as a taster, even on locked chapters."><%= ch.excerpt || '' %></textarea></div>
+    <div class="field"><label for="commentary">Chapter text</label><textarea id="commentary" name="commentary" class="tall" placeholder="Paste the chapter here. Leave a blank line between paragraphs. ## for a heading, **bold**, *italic*, > for a quote."><%= ch.commentary || '' %></textarea><span class="hint">Readers need to have donated to read this, unless the chapter is free.</span></div>
+    <div class="grid-2">
+      <div class="field"><label for="key_ideas">In this chapter: key points (one per line, optional)</label><textarea id="key_ideas" name="key_ideas" rows="5"><%= ch.key_ideas || '' %></textarea></div>
+      <div class="field"><label for="questions">Reflection questions (one per line)</label><textarea id="questions" name="questions" rows="5"><%= ch.questions || '' %></textarea></div>
+    </div>
+    <div class="field"><label for="quotes">Shareable quotes (one per line)</label><textarea id="quotes" name="quotes" rows="3" placeholder="Short lines readers can turn into image cards."><%= ch.quotes || '' %></textarea><span class="hint">Keep each under about 200 characters so it fits on the card.</span></div>
+    <div class="form-grid">
+      <div class="field"><label for="publish_on">Publish on</label><input id="publish_on" name="publish_on" type="date" value="<%= ch.publish_on || '' %>"><span class="hint">Empty = draft. A future date schedules it; readers see "Coming soon" until then.</span></div>
+      <div class="field"><span class="label-txt">Access</span><label class="check"><input type="checkbox" name="is_free" <%= ch.is_free ? 'checked' : '' %>> Free for everyone (no donation needed)</label></div>
+    </div>
+    <div class="form-actions"><button class="btn btn-primary" type="submit">Save chapter</button></div>
+  </form>
+  <% if (ch.id) { %>
+  <form method="post" action="/admin/chapters/<%= ch.id %>/delete" class="card" data-confirm="Delete this chapter, its reviews and readers' reflections? This can't be undone.">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <div class="page-head"><div><h2 style="font-size: 20px">Delete chapter</h2><p class="muted" style="margin: 4px 0 0; font-size: 14px">To hide it without losing anything, clear the publish date instead.</p></div><button class="btn btn-danger btn-sm" type="submit">Delete</button></div>
+  </form>
+  <% } %>
+</main>
+<%- include('../partials/foot') %>

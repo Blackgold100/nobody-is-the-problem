@@ -1,0 +1,12 @@
+<%- include('../partials/head') %>
+<main class="wrap page" style="max-width: 900px">
+  <div class="page-head"><div><h1>Email subscribers</h1><p class="muted" style="margin: 4px 0 0"><%= subscribers.length %> people want to hear about new chapters. Download the list to send your monthly email from Mailchimp, Brevo or Gmail.</p></div><a class="btn btn-primary" href="/admin/subscribers.csv">Download CSV</a></div>
+  <section class="card">
+    <% if (!subscribers.length) { %><div class="empty">No subscribers yet.</div><% } else { %>
+    <div class="table-wrap"><table class="data"><thead><tr><th>Email</th><th>Name</th><th>Joined</th></tr></thead><tbody>
+      <% subscribers.forEach(function (s) { %><tr><td><%= s.email %></td><td><%= s.name || '—' %></td><td class="muted"><%= longDate(s.created_at) %></td></tr><% }) %>
+    </tbody></table></div>
+    <% } %>
+  </section>
+</main>
+<%- include('../partials/foot') %>

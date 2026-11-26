@@ -1,0 +1,16 @@
+<%- include('partials/head') %>
+<main class="narrow section" style="max-width: 460px">
+  <h1 style="font-size: 34px; margin-bottom: 8px">Create your account</h1>
+  <p class="muted">Free. Read the free chapter, save reflections and get the <%= site.pass_name %> when you're ready.</p>
+  <% if (error) { %><div class="alert alert-error" role="alert"><%= error %></div><% } %>
+  <form method="post" action="/signup" class="stack">
+    <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="next" value="<%= next %>">
+    <div class="field"><label for="name">Your name</label><input id="name" name="name" type="text" required autocomplete="name" value="<%= form.name || '' %>"></div>
+    <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required autocomplete="email" value="<%= form.email || '' %>"></div>
+    <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" required minlength="8" autocomplete="new-password"><span class="hint">At least 8 characters.</span></div>
+    <label class="check"><input type="checkbox" name="subscribe" checked> Email me when each new chapter review is released</label>
+    <button class="btn btn-primary" type="submit">Create account</button>
+  </form>
+  <p class="muted" style="margin-top: 20px">Already have an account? <a href="/login<%= next ? '?next=' + encodeURIComponent(next) : '' %>">Sign in</a></p>
+</main>
+<%- include('partials/foot') %>
