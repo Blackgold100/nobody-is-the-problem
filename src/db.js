@@ -7,12 +7,14 @@ const bcrypt = require('bcryptjs');
 types.setTypeParser(1700, (v) => (v === null ? null : parseFloat(v)));
 types.setTypeParser(1082, (v) => v);
 
+// Vercel's Postgres (Neon) integration may name the variable POSTGRES_URL.
+if (!process.env.DATABASE_URL && process.env.POSTGRES_URL) process.env.DATABASE_URL = process.env.POSTGRES_URL;
 if (!process.env.DATABASE_URL) {
-  console.error('DATABASE_URL is not set. On Replit, add a PostgreSQL database from the Database tool.');
-  process.exit(1);
+  console.error('DATABASE_URL is not set. Add a Postgres database (Vercel: Storage → Neon; Replit: Database tool).');
+  if (!process.env.VERCEL) process.exit(1); // on Vercel the site shows a setup page instead
 }
-const isLocal = /localhost|127\.0\.0\.1/.test(process.env.DATABASE_URL);
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: isLocal ? false : { rejectUnauthorized: false }, max: 10 });
+const isLocal = /localhost|127\.0\.0\.1/.test(process.env.DATABASE_URL || '');
+const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: isLocal ? false : { rejectUnauthorized: false }, max: process.env.VERCEL ? 3 : 10, idleTimeoutMillis: 10000 });
 // "Today" for chapter releases is worked out in the app, in SITE_TIMEZONE
 // (default Africa/Lagos), and passed to queries; see helpers.today().
 const TZ = process.env.SITE_TIMEZONE || 'Africa/Lagos';

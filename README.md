@@ -23,6 +23,18 @@ The home of the book *Nobody Is the Problem* by Lincoln Matthew. Readers can rea
 
 ---
 
+## Deploy on Vercel
+
+The site runs on Vercel as an Express app with no extra configuration.
+
+1. **Import:** at vercel.com/new, choose **Import Git Repository** and pick this repository. Leave the framework as detected (Express) and the build settings empty.
+2. **Database:** in the project, open **Storage → Create Database → Neon (Postgres)**, connect it to the project for all environments. This adds `DATABASE_URL`.
+3. **Environment variables** (Settings → Environment Variables): `SESSION_SECRET` (64 random characters), `AUTHOR_EMAIL`, and optionally `AUTHOR_PASSWORD` and `PUBLIC_URL`.
+4. **Deploy** (or redeploy after adding variables). If a setting is missing, the site shows a page saying which one.
+5. Sign in at `/login` and add your bank details under Dashboard → Settings.
+
+Notes: static files are in `public/static/` and served by Vercel's CDN at `/static/...`. Receipts are limited to 4 MB, because Vercel requests are capped at about 4.5 MB. If you add a new page template, add it to `src/views-manifest.js` so Vercel bundles it.
+
 ## Deploy on Replit
 
 1. **Get the code in.** Use **Create App → Import from GitHub**, or upload this folder.

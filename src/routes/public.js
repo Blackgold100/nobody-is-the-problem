@@ -148,7 +148,7 @@ const transferLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, limit: 8, standardHeaders: 'draft-7', legacyHeaders: false,
   handler: (req, res) => { h.flash(req, 'error', 'Too many attempts. Please wait a little and try again.'); res.redirect('/pass'); },
 });
-const proofUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024, files: 1, fields: 20 } });
+const proofUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 4 * 1024 * 1024, files: 1, fields: 20 } });
 function imageMime(buf) {
   if (!buf || buf.length < 12) return null;
   if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'image/jpeg';
@@ -158,7 +158,7 @@ function imageMime(buf) {
   return null;
 }
 router.post('/pass/transfer', transferLimiter, h.requireLogin, (req, res, next) => proofUpload.single('proof')(req, res, (err) => {
-  if (err) { h.flash(req, 'error', 'The receipt must be an image or PDF under 5 MB.'); return res.redirect('/pass'); }
+  if (err) { h.flash(req, 'error', 'The receipt must be an image or PDF under 4 MB.'); return res.redirect('/pass'); }
   next();
 }), h.checkCsrf, wrap(async (req, res) => {
   const site = res.locals.site;
