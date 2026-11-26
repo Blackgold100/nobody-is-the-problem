@@ -1,4 +1,6 @@
 require('./src/env');
+// Log instead of crashing on stray async errors (a crash shows as FUNCTION_INVOCATION_FAILED on Vercel)
+process.on('unhandledRejection', (e) => console.error('Unhandled promise rejection:', e));
 const path = require('path');
 const express = require('express');
 const session = require('express-session');

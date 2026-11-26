@@ -2,7 +2,9 @@
 // Regenerate if you add a template: see README (Vercel).
 const fs = require('fs');
 const path = require('path');
-module.exports = [
+let found = 0;
+try {
+  found = [
   fs.readFileSync(path.join(__dirname, '..', 'views', 'account.ejs')).length,
   fs.readFileSync(path.join(__dirname, '..', 'views', 'admin', 'chapter-edit.ejs')).length,
   fs.readFileSync(path.join(__dirname, '..', 'views', 'admin', 'chapters.ejs')).length,
@@ -26,4 +28,8 @@ module.exports = [
   fs.readFileSync(path.join(__dirname, '..', 'views', 'partials', 'stars.ejs')).length,
   fs.readFileSync(path.join(__dirname, '..', 'views', 'pass.ejs')).length,
   fs.readFileSync(path.join(__dirname, '..', 'views', 'signup.ejs')).length,
-];
+  ].length;
+} catch (e) {
+  console.error('Some page templates are missing from the deployment:', e.message);
+}
+module.exports = found;
