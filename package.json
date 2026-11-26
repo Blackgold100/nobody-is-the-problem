@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "test": "node test/site.test.js"
+    "test": "node --no-experimental-require-module test/site.test.js"
   },
   "license": "UNLICENSED",
   "dependencies": {
@@ -19,13 +19,16 @@
     "express-rate-limit": "^8.7.5",
     "express-session": "^1.19.0",
     "helmet": "^8.3.0",
-    "marked": "^18.2.1",
+    "marked": "15.0.12",
     "multer": "^2.5.0",
     "pg": "^8.23.1",
-    "sanitize-html": "^2.18.2"
+    "sanitize-html": "2.18.2"
   },
   "engines": {
     "node": "22.x"
   },
-  "private": true
+  "private": true,
+  "overrides": {
+    "htmlparser2": "10.1.0"
+  }
 }

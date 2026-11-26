@@ -90,7 +90,7 @@ async function waitUp() {
 
 (async () => {
   await new Promise((r) => mock.listen(MOCK, '127.0.0.1', r));
-  const server = spawn(process.execPath, [path.join(__dirname, '..', 'server.js')], {
+  const server = spawn(process.execPath, [...process.execArgv, path.join(__dirname, '..', 'server.js')], {
     env: { ...process.env, PORT: String(PORT), PAYSTACK_BASE_URL: `http://127.0.0.1:${MOCK}`, PAYSTACK_SECRET_KEY: SECRET, PUBLIC_URL: B, NODE_ENV: 'test' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
