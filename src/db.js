@@ -28,6 +28,20 @@ async function migrate() {
 // password is generated and printed in the console (it must be changed at first sign-in).
 async function ensureAuthor() {
   const { rows } = await pool.query("SELECT COUNT(*)::int AS n FROM users WHERE role='author'");
+  // Recovery: with AUTHOR_RESET=yes, the author's email and password are set from
+  // AUTHOR_EMAIL and AUTHOR_PASSWORD on the next start. Remove AUTHOR_RESET afterwards.
+  if (rows[0].n > 0 && process.env.AUTHOR_RESET === 'yes') {
+    const email = (process.env.AUTHOR_EMAIL || '').trim().toLowerCase();
+    const pw = process.env.AUTHOR_PASSWORD || '';
+    if (!email || pw.length < 10) { console.warn('AUTHOR_RESET needs AUTHOR_EMAIL and an AUTHOR_PASSWORD of at least 10 characters.'); return; }
+    const { rows: [a] } = await pool.query("SELECT id FROM users WHERE role='author' ORDER BY id LIMIT 1");
+    const { rows: [clash] } = await pool.query('SELECT id FROM users WHERE lower(email)=$1 AND id<>$2', [email, a.id]);
+    if (clash) { console.warn(`AUTHOR_RESET: ${email} already belongs to a reader account; choose another email.`); return; }
+    await pool.query('UPDATE users SET email=$1, password_hash=$2, must_change_password=FALSE, failed_logins=0, locked_until=NULL WHERE id=$3',
+      [email, await bcrypt.hash(pw, 12), a.id]);
+    console.log(`Author sign-in reset for ${email}. Remove AUTHOR_RESET now.`);
+    return;
+  }
   if (rows[0].n > 0) return;
   const email = (process.env.AUTHOR_EMAIL || 'author@example.com').trim().toLowerCase();
   const given = process.env.AUTHOR_PASSWORD;
